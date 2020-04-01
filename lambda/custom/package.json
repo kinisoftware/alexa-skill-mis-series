@@ -1,0 +1,31 @@
+{
+  "name": "mis-series",
+  "version": "1.2.0",
+  "description": "alexa utility for quickly building skills",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "npm run clean && npm run compile && cp \"package.json\" build/src && cd build/src && npm install --production",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
+  },
+  "author": "Kinisoftware",
+  "license": "Apache License",
+  "dependencies": {
+    "ask-sdk-core": "^2.7.0",
+    "ask-sdk-model": "^1.19.0",
+    "aws-sdk": "^2.326.0",
+    "i18next": "^15.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^10.0.3",
+    "typescript": "~3.7.0",
+    "i18n-ts": "^1.0.5",
+    "gts": "^1.1.2"
+  }
+}

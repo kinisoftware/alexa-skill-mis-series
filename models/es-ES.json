@@ -1,0 +1,78 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "mis series",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AddTvShowIntent",
+                    "slots": [
+                        {
+                            "name": "tvShow",
+                            "type": "AMAZON.TVSeries",
+                            "samples": [
+                                "{tvShow}",
+                                "la serie {tvShow}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "añade la serie {tvShow} a la lista",
+                        "quiero añadir la serie {tvShow}",
+                        "añade la serie {tvShow}",
+                        "añade una serie",
+                        "añade {tvShow} a la lista"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                }
+            ],
+            "types": []
+        },
+        "dialog": {
+            "intents": [
+                {
+                    "name": "AddTvShowIntent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "tvShow",
+                            "type": "AMAZON.TVSeries",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.795283593128.1057740653710"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "delegationStrategy": "ALWAYS"
+        },
+        "prompts": [
+            {
+                "id": "Elicit.Slot.795283593128.1057740653710",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "¿qué serie?"
+                    }
+                ]
+            }
+        ]
+    }
+}
