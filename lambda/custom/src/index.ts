@@ -1,21 +1,13 @@
-/* *
- * This sample demonstrates handling intents from an Alexa skill using the Alexa Skills Kit SDK (v2).
- * Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
- * session persistence, api calls, and more.
- * */
-import {HandlerInput} from "ask-sdk-core";
-import i18next from "i18next";
-import InitOptions = i18next.InitOptions;
+import * as alexa from 'ask-sdk-core';
+import {HandlerInput} from 'ask-sdk-core';
+import i18n from 'i18next';
+import InitOptions = i18n.InitOptions;
 
-const Alexa = require('ask-sdk-core');
-// i18n library dependency, we use it below in a localisation interceptor
-const i18n = require('i18next');
-// i18n strings for all supported locales
 const languageStrings = require('./languageStrings');
 
-const LaunchRequestHandler = {
+const launchRequestHandler = {
     canHandle(handlerInput: HandlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
+        return alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     handle(handlerInput: HandlerInput) {
         const speakOutput = i18n.t('WELCOME.MSG') + i18n.t('WELCOME.PROMPT');
@@ -25,28 +17,30 @@ const LaunchRequestHandler = {
             .speak(speakOutput)
             .reprompt(reprompt)
             .getResponse();
-    }
+    },
 };
 
-const AddTvShowIntentHandler = {
+const addTvShowIntentHandler = {
     canHandle(handlerInput: HandlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AddTvShowIntent';
+        return (
+            alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
+            alexa.getIntentName(handlerInput.requestEnvelope) === 'AddTvShowIntent'
+        );
     },
     handle(handlerInput: HandlerInput) {
-        const tvShow = Alexa.getSlotValue(handlerInput.requestEnvelope, 'tvShow');
+        const tvShow = alexa.getSlotValue(handlerInput.requestEnvelope, 'tvShow');
         const speakOutput = i18n.t('ADD_TV_SHOW_MSG', {tvShow});
 
-        return handlerInput.responseBuilder
-            .speak(speakOutput)
-            .getResponse();
-    }
+        return handlerInput.responseBuilder.speak(speakOutput).getResponse();
+    },
 };
 
-const HelpIntentHandler = {
+const helpIntentHandler = {
     canHandle(handlerInput: HandlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.HelpIntent';
+        return (
+            alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
+            alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.HelpIntent'
+        );
     },
     handle(handlerInput: HandlerInput) {
         const speakOutput = i18n.t('HELP_MSG');
@@ -55,32 +49,34 @@ const HelpIntentHandler = {
             .speak(speakOutput)
             .reprompt(speakOutput)
             .getResponse();
-    }
+    },
 };
 
-const CancelAndStopIntentHandler = {
+const cancelAndStopIntentHandler = {
     canHandle(handlerInput: HandlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent'
-                || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent');
+        return (
+            alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
+            (alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent' ||
+                alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent')
+        );
     },
     handle(handlerInput: HandlerInput) {
         const speakOutput = i18n.t('GOODBYE_MSG');
 
-        return handlerInput.responseBuilder
-            .speak(speakOutput)
-            .getResponse();
-    }
+        return handlerInput.responseBuilder.speak(speakOutput).getResponse();
+    },
 };
 /* *
  * FallbackIntent triggers when a customer says something that doesn’t map to any intents in your skill
  * It must also be defined in the language model (if the locale supports it)
- * This handler can be safely added but will be ingnored in locales that do not support it yet 
+ * This handler can be safely added but will be ingnored in locales that do not support it yet
  * */
-const FallbackIntentHandler = {
+const fallbackIntentHandler = {
     canHandle(handlerInput: HandlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent';
+        return (
+            alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
+            alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent'
+        );
     },
     handle(handlerInput: HandlerInput) {
         const speakOutput = i18n.t('FALLBACK_MSG');
@@ -89,48 +85,50 @@ const FallbackIntentHandler = {
             .speak(speakOutput)
             .reprompt(speakOutput)
             .getResponse();
-    }
+    },
 };
-/* *
- * SessionEndedRequest notifies that a session was ended. This handler will be triggered when a currently open 
- * session is closed for one of the following reasons: 1) The user says "exit" or "quit". 2) The user does not 
- * respond or says something that does not match an intent defined in your voice model. 3) An error occurs 
- * */
-const SessionEndedRequestHandler = {
+/**
+ * SessionEndedRequest notifies that a session was ended. This handler will be triggered when a currently open
+ * session is closed for one of the following reasons: 1) The user says "exit" or "quit". 2) The user does not
+ * respond or says something that does not match an intent defined in your voice model. 3) An error occurs
+ */
+const sessionEndedRequestHandler = {
     canHandle(handlerInput: HandlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'SessionEndedRequest';
+        return alexa.getRequestType(handlerInput.requestEnvelope) === 'SessionEndedRequest';
     },
     handle(handlerInput: HandlerInput) {
         console.log(`~~~~ Session ended: ${JSON.stringify(handlerInput.requestEnvelope)}`);
         // Any cleanup logic goes here.
         return handlerInput.responseBuilder.getResponse(); // notice we send an empty response
-    }
+    },
 };
-/* *
+/**
  * The intent reflector is used for interaction model testing and debugging.
- * It will simply repeat the intent the user said. You can create custom handlers for your intents 
- * by defining them above, then also adding them to the request handler chain below 
- * */
-const IntentReflectorHandler = {
+ * It will simply repeat the intent the user said. You can create custom handlers for your intents
+ * by defining them above, then also adding them to the request handler chain below
+ */
+const intentReflectorHandler = {
     canHandle(handlerInput: HandlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
+        return alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
     },
     handle(handlerInput: HandlerInput) {
-        const intentName = Alexa.getIntentName(handlerInput.requestEnvelope);
-        const speakOutput = i18n.t('REFLECTOR_MSG', {intentName: intentName});
+        const intentName = alexa.getIntentName(handlerInput.requestEnvelope);
+        const speakOutput = i18n.t('REFLECTOR_MSG', {intentName});
 
-        return handlerInput.responseBuilder
-            .speak(speakOutput)
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
-            .getResponse();
-    }
+        return (
+            handlerInput.responseBuilder
+                .speak(speakOutput)
+                //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
+                .getResponse()
+        );
+    },
 };
 /**
  * Generic error handling to capture any syntax or routing errors. If you receive an error
  * stating the request handler chain is not found, you have not implemented a handler for
  * the intent being invoked or included it in the skill builder below
- * */
-const ErrorHandler = {
+ */
+const errorHandler = {
     canHandle() {
         return true;
     },
@@ -142,34 +140,33 @@ const ErrorHandler = {
             .speak(speakOutput)
             .reprompt(speakOutput)
             .getResponse();
-    }
+    },
 };
 
 // This request interceptor will bind a translation function 't' to the handlerInput
-const LocalisationRequestInterceptor = {
+const localisationRequestInterceptor = {
     process(handlerInput: HandlerInput) {
         i18n.init({
-            lng: Alexa.getLocale(handlerInput.requestEnvelope),
-            resources: languageStrings
+            lng: alexa.getLocale(handlerInput.requestEnvelope),
+            resources: languageStrings,
         } as InitOptions);
-    }
+    },
 };
 /**
  * This handler acts as the entry point for your skill, routing all request and response
  * payloads to the handlers above. Make sure any new handlers or interceptors you've
  * defined are included below. The order matters - they're processed top to bottom
- * */
-exports.handler = Alexa.SkillBuilders.custom()
+ */
+exports.handler = alexa.SkillBuilders.custom()
     .addRequestHandlers(
-        LaunchRequestHandler,
-        AddTvShowIntentHandler,
-        HelpIntentHandler,
-        CancelAndStopIntentHandler,
-        FallbackIntentHandler,
-        SessionEndedRequestHandler,
-        IntentReflectorHandler)
-    .addErrorHandlers(
-        ErrorHandler)
-    .addRequestInterceptors(
-        LocalisationRequestInterceptor)
+        launchRequestHandler,
+        addTvShowIntentHandler,
+        helpIntentHandler,
+        cancelAndStopIntentHandler,
+        fallbackIntentHandler,
+        sessionEndedRequestHandler,
+        intentReflectorHandler
+    )
+    .addErrorHandlers(errorHandler)
+    .addRequestInterceptors(localisationRequestInterceptor)
     .lambda();

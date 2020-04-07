@@ -4,7 +4,7 @@
   "description": "alexa utility for quickly building skills",
   "main": "src/index.ts",
   "scripts": {
-    "build": "npm run clean && npm run compile && cp \"package.json\" build/src && cd build/src && npm install --production",
+    "build": "npm run clean && npm run fix && npm run compile && cp \"package.json\" build/src && cd build/src && npm install --production",
     "test": "echo \"Error: no test specified\" && exit 1",
     "check": "gts check",
     "clean": "gts clean",
