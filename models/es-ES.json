@@ -16,6 +16,16 @@
                     "samples": []
                 },
                 {
+                    "name": "TvShowRecommendationIntent",
+                    "slots": [],
+                    "samples": [
+                        "dame una recomendacion",
+                        "recomiendame una serie",
+                        "dime una serie",
+                        "que puedo ver ahora"
+                    ]
+                },
+                {
                     "name": "AddTvShowIntent",
                     "slots": [
                         {

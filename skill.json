@@ -23,8 +23,9 @@
       "custom": {
         "endpoint": {
           "sourceDir": "lambda/custom",
-          "uri": "ask-custom-alexa-skill-mis-series-default"
-        }
+          "uri": "arn:aws:lambda:eu-west-1:415503865685:function:ask-custom-alexa-skill-mis-series-default:v1"
+        },
+        "interfaces": []
       }
     },
     "manifestVersion": "1.0"

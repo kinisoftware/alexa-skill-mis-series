@@ -1,7 +1,9 @@
 import * as alexa from 'ask-sdk-core';
 import {HandlerInput} from 'ask-sdk-core';
 import i18n from 'i18next';
+import {Response} from 'ask-sdk-model';
 import InitOptions = i18n.InitOptions;
+import {DynamoDbPersistenceAdapter} from 'ask-sdk-dynamodb-persistence-adapter';
 
 const languageStrings = require('./languageStrings');
 
@@ -30,6 +32,34 @@ const addTvShowIntentHandler = {
     handle(handlerInput: HandlerInput) {
         const tvShow = alexa.getSlotValue(handlerInput.requestEnvelope, 'tvShow');
         const speakOutput = i18n.t('ADD_TV_SHOW_MSG', {tvShow});
+
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        if (sessionAttributes.tvShows === undefined) {
+            sessionAttributes.tvShows = [tvShow];
+        } else {
+            sessionAttributes.tvShows.push(tvShow);
+        }
+
+        return handlerInput.responseBuilder.speak(speakOutput).getResponse();
+    },
+};
+
+const tvShowRecommendationIntentHandler = {
+    canHandle(handlerInput: HandlerInput) {
+        return (
+            alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
+            alexa.getIntentName(handlerInput.requestEnvelope) === 'TvShowRecommendationIntent'
+        );
+    },
+    handle(handlerInput: HandlerInput) {
+        let speakOutput;
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        if (sessionAttributes.tvShows === undefined || sessionAttributes.tvShows.length === 0) {
+            speakOutput = i18n.t('TV_SHOW_RECOMMENDATION.NO_TV_SHOW_MSG');
+        } else {
+            const tvShow = sessionAttributes.tvShows.pop();
+            speakOutput = i18n.t('TV_SHOW_RECOMMENDATION.RECOMMENDATION_MSG', {tvShow});
+        }
 
         return handlerInput.responseBuilder.speak(speakOutput).getResponse();
     },
@@ -152,6 +182,47 @@ const localisationRequestInterceptor = {
         } as InitOptions);
     },
 };
+
+const loggingRequestInterceptor = {
+    process(handlerInput: HandlerInput) {
+        console.log(`Incoming request: ${JSON.stringify(handlerInput.requestEnvelope)}`);
+    },
+};
+
+const loggingResponseInterceptor = {
+    process(handlerInput: HandlerInput, response: Response) {
+        console.log(`Outgoing response: ${JSON.stringify(response)}`);
+    },
+};
+
+const loadAttributesRequestInterceptor = {
+    async process(handlerInput: HandlerInput) {
+        const {attributesManager, requestEnvelope} = handlerInput;
+        if (alexa.isNewSession(requestEnvelope)) {
+            const persistentAttributes = (await attributesManager.getPersistentAttributes()) || {};
+            console.log('Loading from persistent storage: ' + JSON.stringify(persistentAttributes));
+            attributesManager.setSessionAttributes(persistentAttributes);
+        }
+    },
+};
+
+const saveAttributesResponseInterceptor = {
+    async process(handlerInput: HandlerInput, response: Response) {
+        if (!response) return; // avoid intercepting calls that have no outgoing response due to errors
+
+        const {attributesManager, requestEnvelope} = handlerInput;
+        const sessionAttributes = attributesManager.getSessionAttributes();
+        const shouldEndSession =
+            typeof response.shouldEndSession === 'undefined' ? true : response.shouldEndSession; //is this a session end?
+        if (shouldEndSession || alexa.getRequestType(requestEnvelope) === 'SessionEndedRequest') {
+            // skill was stopped or timed out
+            console.log('Saving to persistent storage:' + JSON.stringify(sessionAttributes));
+            attributesManager.setPersistentAttributes(sessionAttributes);
+            await attributesManager.savePersistentAttributes();
+        }
+    },
+};
+
 /**
  * This handler acts as the entry point for your skill, routing all request and response
  * payloads to the handlers above. Make sure any new handlers or interceptors you've
@@ -161,6 +232,7 @@ exports.handler = alexa.SkillBuilders.custom()
     .addRequestHandlers(
         launchRequestHandler,
         addTvShowIntentHandler,
+        tvShowRecommendationIntentHandler,
         helpIntentHandler,
         cancelAndStopIntentHandler,
         fallbackIntentHandler,
@@ -168,5 +240,20 @@ exports.handler = alexa.SkillBuilders.custom()
         intentReflectorHandler
     )
     .addErrorHandlers(errorHandler)
-    .addRequestInterceptors(localisationRequestInterceptor)
+    .addRequestInterceptors(
+        localisationRequestInterceptor,
+        loggingRequestInterceptor,
+        loadAttributesRequestInterceptor
+    )
+    .withPersistenceAdapter(
+        new DynamoDbPersistenceAdapter({
+            tableName: 'my_tv_shows_skill',
+            createTable: true,
+            partitionKeyGenerator: requestEnvelope => {
+                const userId = alexa.getUserId(requestEnvelope);
+                return userId.substr(userId.lastIndexOf('.') + 1);
+            },
+        })
+    )
+    .addResponseInterceptors(saveAttributesResponseInterceptor, loggingResponseInterceptor)
     .lambda();
