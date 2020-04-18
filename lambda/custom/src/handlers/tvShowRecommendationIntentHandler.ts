@@ -1,6 +1,7 @@
 import * as alexa from 'ask-sdk-core';
 import {HandlerInput} from 'ask-sdk-core';
 import i18n from 'i18next';
+import {SessionAttributes} from '../model/sessionAttributes';
 
 export const tvShowRecommendationIntentHandler = {
     canHandle(handlerInput: HandlerInput) {
@@ -11,12 +12,13 @@ export const tvShowRecommendationIntentHandler = {
     },
     handle(handlerInput: HandlerInput) {
         let speakOutput;
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const sessionAttributes: SessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         if (sessionAttributes.tvShows === undefined || sessionAttributes.tvShows.length === 0) {
             speakOutput = i18n.t('TV_SHOW_RECOMMENDATION.NO_TV_SHOW_MSG');
         } else {
             const tvShow = sessionAttributes.tvShows.pop();
-            speakOutput = i18n.t('TV_SHOW_RECOMMENDATION.RECOMMENDATION_MSG', {tvShow});
+            const tvShowName = tvShow!!.name;
+            speakOutput = i18n.t('TV_SHOW_RECOMMENDATION.RECOMMENDATION_MSG', {tvShowName});
         }
 
         return handlerInput.responseBuilder.speak(speakOutput).getResponse();
