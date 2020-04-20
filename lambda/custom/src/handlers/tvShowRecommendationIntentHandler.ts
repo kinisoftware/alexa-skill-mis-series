@@ -21,6 +21,9 @@ export const tvShowRecommendationIntentHandler = {
             speakOutput = i18n.t('TV_SHOW_RECOMMENDATION.RECOMMENDATION_MSG', {tvShowName});
         }
 
-        return handlerInput.responseBuilder.speak(speakOutput).getResponse();
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .withShouldEndSession(true)
+            .getResponse();
     },
 };

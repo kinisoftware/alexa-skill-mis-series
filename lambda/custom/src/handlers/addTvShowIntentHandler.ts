@@ -15,12 +15,14 @@ export const addTvShowIntentHandler = {
         const tvShowName = alexa.getSlotValue(handlerInput.requestEnvelope, 'tvShow');
         let speakOutput;
 
+        const collator = new Intl.Collator('es', {sensitivity: 'base'});
+
         const sessionAttributes: SessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         let tvShows = sessionAttributes.tvShows;
         if (tvShows === undefined) {
             tvShows = [new TvShow(tvShowName)];
             speakOutput = i18n.t('ADD_TV_SHOW.ADDED', {tvShowName});
-        } else if (tvShows.some(tvShow => tvShow.name === tvShowName)) {
+        } else if (tvShows.some(tvShow => collator.compare(tvShow.name, tvShowName) === 0)) {
             speakOutput = i18n.t('ADD_TV_SHOW.ALREADY_EXISTS', {tvShowName});
         } else {
             tvShows.push(new TvShow(tvShowName));
@@ -28,6 +30,9 @@ export const addTvShowIntentHandler = {
         }
         sessionAttributes.tvShows = tvShows;
 
-        return handlerInput.responseBuilder.speak(speakOutput).getResponse();
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .withShouldEndSession(true)
+            .getResponse();
     },
 };
