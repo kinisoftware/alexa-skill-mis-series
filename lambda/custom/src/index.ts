@@ -15,6 +15,8 @@ import {loadAttributesRequestInterceptor} from './interceptors/loadAttributesReq
 import {saveAttributesResponseInterceptor} from './interceptors/saveAttributesResponseInterceptor';
 import {buildPersistenceAdapter} from './PersistenceAdapterBuilder';
 
+const persistenceAdapter = buildPersistenceAdapter();
+
 /**
  * This handler acts as the entry point for your skill, routing all request and response
  * payloads to the handlers above. Make sure any new handlers or interceptors you've
@@ -37,6 +39,6 @@ exports.handler = alexa.SkillBuilders.custom()
         loggingRequestInterceptor,
         loadAttributesRequestInterceptor
     )
-    .withPersistenceAdapter(buildPersistenceAdapter())
+    .withPersistenceAdapter(persistenceAdapter)
     .addResponseInterceptors(saveAttributesResponseInterceptor, loggingResponseInterceptor)
     .lambda();

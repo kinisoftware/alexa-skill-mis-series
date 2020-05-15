@@ -17,8 +17,18 @@
                 },
                 {
                     "name": "TvShowRecommendationIntent",
-                    "slots": [],
+                    "slots": [
+                        {
+                            "name": "tvShowProvider",
+                            "type": "TvShowProvider"
+                        }
+                    ],
                     "samples": [
+                        "quiero ver una serie en {tvShowProvider}",
+                        "quiero ver una serie de {tvShowProvider}",
+                        "dime una serie de {tvShowProvider}",
+                        "dame una recomendacion de {tvShowProvider}",
+                        "recomiendame una serie de {tvShowProvider}",
                         "dame una recomendacion",
                         "recomiendame una serie",
                         "dime una serie",
@@ -35,9 +45,22 @@
                                 "{tvShow}",
                                 "la serie {tvShow}"
                             ]
+                        },
+                        {
+                            "name": "tvShowProvider",
+                            "type": "TvShowProvider",
+                            "samples": [
+                                "la echan en {tvShowProvider}",
+                                "la emiten en {tvShowProvider}",
+                                "en {tvShowProvider}",
+                                "{tvShowProvider}"
+                            ]
                         }
                     ],
                     "samples": [
+                        "añade la serie {tvShow} que está en {tvShowProvider}",
+                        "añade la serie {tvShow} de {tvShowProvider}",
+                        "añade la serie {tvShow} que echan en {tvShowProvider}",
                         "añade la serie {tvShow} a la lista",
                         "quiero añadir la serie {tvShow}",
                         "añade la serie {tvShow}",
@@ -50,7 +73,49 @@
                     "samples": []
                 }
             ],
-            "types": []
+            "types": [
+                {
+                    "name": "TvShowProvider",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "movistar",
+                                "synonyms": [
+                                    "movistar plus"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "disney",
+                                "synonyms": [
+                                    "disney plus"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "amazon",
+                                "synonyms": [
+                                    "prime",
+                                    "amazon prime",
+                                    "amazon video"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "hbo"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "netflix"
+                            }
+                        }
+                    ]
+                }
+            ]
         },
         "dialog": {
             "intents": [
@@ -67,6 +132,15 @@
                             "prompts": {
                                 "elicitation": "Elicit.Slot.795283593128.1057740653710"
                             }
+                        },
+                        {
+                            "name": "tvShowProvider",
+                            "type": "TvShowProvider",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.66231891192.799426043833"
+                            }
                         }
                     ]
                 }
@@ -80,6 +154,27 @@
                     {
                         "type": "PlainText",
                         "value": "¿qué serie?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.66231891192.799426043833",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "¿dónde se puede ver {tvShow} ?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "¿dónde echan {tvShow} ?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "¿dónde emiten {tvShow} ?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "¿en qué plataforma echan {tvShow} ?"
                     }
                 ]
             }

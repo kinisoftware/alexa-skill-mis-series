@@ -18,6 +18,9 @@ module.exports = {
             TV_SHOW_RECOMMENDATION: {
                 NO_TV_SHOW_MSG: 'Lo siento, aún no tengo ninguna serie guardada que recomendarte.',
                 RECOMMENDATION_MSG: 'Te recomiendo la serie {{tvShowName}}',
+                RECOMMENDATION_MSG_WITH_PROVIDER:
+                    'Te recomiendo la serie {{tvShowName}} que puedes ver en {{tvShowProvider}}',
+                NO_TV_SHOW_FOR_PROVIDER: 'Lo siento, no tengo ninguna serie guardada de {{tvShowProvider}}',
             },
             ADD_TV_SHOW: {
                 ADDED: 'Vale, añado {{tvShowName}} a la lista',
