@@ -4,11 +4,12 @@
   "description": "alexa utility for quickly building skills",
   "main": "src/index.ts",
   "scripts": {
-    "build": "npm run clean && npm run fix && npm run compile && cp \"package.json\" build/src && cd build/src && npm install --production",
+    "deploy": "npm run build && cd lib/src && zip -r lambda.zip . && aws lambda update-function-code --region eu-west-1 --profile alexa --function-name ask-custom-alexa-skill-mis-series-default --zip-file fileb://lambda.zip",
+    "build": "npm run clean && npm run compile && cp \"package.json\" lib/src && cp -r src/documents lib/src && cd lib/src && npm install --production",
     "test": "echo \"Error: no test specified\" && exit 1",
     "check": "gts check",
     "clean": "gts clean",
-    "compile": "tsc -p .",
+    "compile": "tsc",
     "fix": "gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
@@ -17,11 +18,12 @@
   "author": "Kinisoftware",
   "license": "Apache License",
   "dependencies": {
-    "ask-sdk-core": "^2.7.0",
-    "ask-sdk-model": "^1.19.0",
+    "ask-sdk-core": "^2.11.0",
+    "ask-sdk-model": "^1.37.1",
     "aws-sdk": "^2.814.0",
     "ask-sdk-dynamodb-persistence-adapter": "^2.7.0",
-    "i18next": "^15.0.5"
+    "i18next": "^15.0.5",
+    "axios": "^0.24.0"
   },
   "devDependencies": {
     "@types/node": "^10.0.3",
