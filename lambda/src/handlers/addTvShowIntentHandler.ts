@@ -4,8 +4,9 @@ import i18n from 'i18next';
 import {TvShow} from '../model/tvShow';
 import {SessionAttributes} from '../model/sessionAttributes';
 import {Slot, slu} from 'ask-sdk-model';
-import Resolution = slu.entityresolution.Resolution;
 import {showDetailsData, supportsAPL} from './utils';
+import Resolution = slu.entityresolution.Resolution;
+
 const axios = require('axios').default;
 const showDetailsDocument = require('../documents/show_details.json');
 
@@ -47,12 +48,14 @@ export const addTvShowIntentHandler = {
                 'Accept-Language': alexa.getLocale(handlerInput.requestEnvelope),
             };
             const response = await axios.get(entityURL, {headers});
-            console.log(JSON.stringify(response.data));
-            const entity = response.data;
-            showTitle = entity.name[0]['@value']
-            showReleaseDate = new Date(Date.parse(entity.version[0].releaseEvent[0].startDateTime[0]['@value'])).toLocaleDateString()
-            showSeasons = entity.numberOfSeasons[0]['@value']
-            showEpisodes = entity.numberOfEpisodes[0]['@value']
+            if (response.status === 200) {
+                console.log(JSON.stringify(response.data));
+                const entity = response.data;
+                showTitle = entity.name[0]['@value']
+                showReleaseDate = new Date(Date.parse(entity.version[0].releaseEvent[0].startDateTime[0]['@value'])).toLocaleDateString()
+                showSeasons = entity.numberOfSeasons[0]['@value']
+                showEpisodes = entity.numberOfEpisodes[0]['@value']
+            }
         }
 
         const collator = new Intl.Collator('es', {sensitivity: 'base'});

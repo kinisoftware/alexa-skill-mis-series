@@ -12,7 +12,7 @@ export const errorHandler = {
     },
     handle(handlerInput: HandlerInput, error: Error) {
         const speakOutput = i18n.t('ERROR_MSG');
-        console.log(`~~~~ Error handled: ${JSON.stringify(error)}`);
+        console.log(`~~~~ Error handled: ${JSON.stringify(error.stack)}`);
 
         return handlerInput.responseBuilder
             .speak(speakOutput)

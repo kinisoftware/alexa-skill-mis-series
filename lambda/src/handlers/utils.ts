@@ -31,7 +31,7 @@ export const showDetailsData = (showTitle: string, showSeasons: number, showEpis
                 "largeSourceUrl": null,
                 "sources": [
                     {
-                        "url": "https://alexa-skill-my-tvshows.s3.eu-west-3.amazonaws.com/1519896425167.jpg",
+                        "url": "https://alexa-skill-my-tvshows.s3.eu-west-3.amazonaws.com/netflix_logo.png",
                         "size": "large"
                     }
                 ]
