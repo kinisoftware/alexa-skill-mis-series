@@ -4,17 +4,25 @@ import i18n from 'i18next';
 import {TvShow} from '../model/tvShow';
 import {SessionAttributes} from '../model/sessionAttributes';
 import {Slot, slu} from 'ask-sdk-model';
-import {showDetailsData, supportsAPL} from './utils';
 import Resolution = slu.entityresolution.Resolution;
+import {showDetailsData, supportsAPL} from "./utils";
 
 const axios = require('axios').default;
 const showDetailsDocument = require('../documents/show_details.json');
+
+const getAlexaEntitiesSlotResolutions = (slot: Slot) => {
+    return (
+        slot.resolutions &&
+        slot.resolutions.resolutionsPerAuthority &&
+        slot.resolutions.resolutionsPerAuthority.find(resolutionMatch)
+    );
+};
 
 const getSlotResolutions = (slot: Slot) => {
     return (
         slot.resolutions &&
         slot.resolutions.resolutionsPerAuthority &&
-        slot.resolutions.resolutionsPerAuthority.find(resolutionMatch)
+        slot.resolutions.resolutionsPerAuthority.find((resolution) => resolution.status.code === 'ER_SUCCESS_MATCH')
     );
 };
 
@@ -36,13 +44,23 @@ export const addTvShowIntentHandler = {
         let showEpisodes = 0;
         let showReleaseDate = '';
 
+        const tvShowProviderSlot = alexa.getSlot(handlerInput.requestEnvelope, 'tvShowProvider');
+        let tvShowProvider = alexa.getSlotValue(handlerInput.requestEnvelope, 'tvShowProvider');
+        const tvShowProviderSlotResolutions = getSlotResolutions(tvShowProviderSlot);
+        if (!tvShowProviderSlotResolutions) {
+            speakOutput = `Lo siento, no conozco la plataforma de series ${tvShowProvider}`;
+            return handlerInput.responseBuilder
+                .speak(speakOutput)
+                .withShouldEndSession(true)
+                .getResponse();
+        }
+
         const tvShowSlot = alexa.getSlot(handlerInput.requestEnvelope, 'tvShow');
         const tvShowName = alexa.getSlotValue(handlerInput.requestEnvelope, 'tvShow');
-        const resolutions = getSlotResolutions(tvShowSlot);
-
-        if (resolutions) {
+        const tvShowSlotResolutions = getAlexaEntitiesSlotResolutions(tvShowSlot);
+        if (tvShowSlotResolutions) {
             const apiAccessToken = alexa.getApiAccessToken(handlerInput.requestEnvelope);
-            const entityURL = resolutions.values[0].value.id;
+            const entityURL = tvShowSlotResolutions.values[0].value.id;
             const headers = {
                 Authorization: `Bearer ${apiAccessToken}`,
                 'Accept-Language': alexa.getLocale(handlerInput.requestEnvelope),
@@ -62,13 +80,14 @@ export const addTvShowIntentHandler = {
 
         const sessionAttributes: SessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         let tvShows = sessionAttributes.tvShows;
+        const tvShow = new TvShow(tvShowName, tvShowProvider);
         if (tvShows === undefined) {
-            tvShows = [new TvShow(tvShowName)];
+            tvShows = [tvShow];
             speakOutput = i18n.t('ADD_TV_SHOW.ADDED', {tvShowName});
         } else if (tvShows.some(tvShow => collator.compare(tvShow.name, tvShowName) === 0)) {
             speakOutput = i18n.t('ADD_TV_SHOW.ALREADY_EXISTS', {tvShowName});
         } else {
-            tvShows.push(new TvShow(tvShowName));
+            tvShows.push(tvShow);
             speakOutput = i18n.t('ADD_TV_SHOW.ADDED', {tvShowName});
         }
         sessionAttributes.tvShows = tvShows;
