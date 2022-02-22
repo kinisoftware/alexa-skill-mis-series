@@ -98,9 +98,9 @@ export const addTvShowIntentHandler = {
                 .addDirective({
                     type: 'Alexa.Presentation.APL.RenderDocument',
                     document: showDetailsDocument,
-                    datasources: showDetailsData(showTitle, showSeasons, showEpisodes, showReleaseDate),
+                    datasources: showDetailsData(showTitle, showSeasons, showEpisodes, tvShowProvider.toLocaleUpperCase()),
                 })
-                .withShouldEndSession(false)
+                .withShouldEndSession(true)
                 .getResponse();
         } else {
             return handlerInput.responseBuilder
